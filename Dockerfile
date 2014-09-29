@@ -1,6 +1,6 @@
-FROM debian:jessie
+FROM debian:wheezy
 
-MAINTAINER Yvonnick Esnault <yvonnick@esnau.lt>
+MAINTAINER Are Pedersen <are@tuntre.net>
 
 ENV DEBIAN_FRONTEND noninteractive 
 ENV DEBCONF_NONINTERACTIVE_SEEN true
@@ -28,9 +28,9 @@ RUN apt-get install -y mysql-server mysql-client libmysqlclient-dev
 # Install Apache
 RUN apt-get install -y apache2
 # Install php
-RUN apt-get install -y php5 libapache2-mod-php5 php5-mcrypt php5-mysql php5-gd php5-dev php5-curl php5-cli php5-json php5-ldap
-# Install VCS binaries (git, mercurial, subversion) to pull sources and for phabricator use
-RUN apt-get install -y git subversion mercurial
+RUN apt-get install -y php5 libapache2-mod-php5 php5-mcrypt php5-mysql php5-gd php5-dev php5-curl php5-cli php5-json php5-ldap php-apc
+# Install VCS binaries (git, subversion) to pull sources and for phabricator use
+RUN apt-get install -y git subversion
 
  # Install postfix
 RUN apt-get install -y postfix
@@ -47,13 +47,17 @@ RUN chmod +x /opt/startup.sh
 
 ADD phabricator.conf /etc/apache2/sites-available/phabricator.conf
 RUN ln -s /etc/apache2/sites-available/phabricator.conf /etc/apache2/sites-enabled/phabricator.conf
-RUN rm -f /etc/apache2/sites-enabled/000-default.conf
+RUN rm -f /etc/apache2/sites-enabled/000-default
 
 RUN cd /opt/ && git clone https://github.com/facebook/libphutil.git
 RUN cd /opt/ && git clone https://github.com/facebook/arcanist.git
 RUN cd /opt/ && git clone https://github.com/facebook/phabricator.git
 
 RUN mkdir -p '/var/repo/'
+
+ADD mysql-phabricator.conf /etc/mysql/conf.d/mysql-phabricator.conf
+ADD php-phabricator.ini /etc/php5/mods-available/php-phabricator.ini
+RUN ln -s /etc/php5/mods-available/php-phabricator.ini /etc/php5/conf.d/20-php-phabricator.ini
 
 RUN ulimit -c 10000
 

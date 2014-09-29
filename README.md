@@ -1,19 +1,19 @@
 docker-phabricator
 ==================
-Dockerfile with debian:jessie / mysql / phabricator
+Dockerfile with debian:wheezy / apache2 / mysql / phabricator
 
 
 Run
 ----
 ```
-docker run yesnault/docker-phabricator
+docker run arep/docker-phabricator
 ```
 
 Build and run
 ---------------
 
 ```
-git clone https://github.com/yesnault/docker-phabricator.git
+git clone https://github.com/arep/docker-phabricator.git
 ./build.sh
 ./run-server.sh
 ````
