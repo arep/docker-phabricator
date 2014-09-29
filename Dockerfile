@@ -55,7 +55,7 @@ RUN cd /opt/ && git clone https://github.com/facebook/phabricator.git
 
 RUN mkdir -p '/var/repo/'
 
-ADD mysql-phabricator.conf /etc/mysql/conf.d/mysql-phabricator.conf
+ADD mysql-phabricator.conf /etc/mysql/conf.d/mysql-phabricator.cnf
 ADD php-phabricator.ini /etc/php5/mods-available/php-phabricator.ini
 RUN ln -s /etc/php5/mods-available/php-phabricator.ini /etc/php5/conf.d/20-php-phabricator.ini
 
