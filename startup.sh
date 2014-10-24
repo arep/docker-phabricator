@@ -21,7 +21,7 @@ git clone git://github.com/facebook/phabricator.git
 chmod 666 /opt/phabricator/conf/local/local.json
 
 # if container restart, fix mysql rights
-chown -R mysql:mysql /var/lib/docker
+chown -R mysql:mysql /var/lib/mysql
 
 cd /opt/phabricator && ./bin/storage upgrade --force
 cd /opt/phabricator && ./bin/phd restart

@@ -1,3 +1,3 @@
 #!/bin/sh
  
-docker build --no-cache -t arep/phabricator .
+docker build -t arep/phabricator .

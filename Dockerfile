@@ -1,4 +1,4 @@
-FROM debian:wheezy
+FROM debian:jessie
 
 MAINTAINER Are Pedersen <are@tuntre.net>
 
@@ -15,6 +15,8 @@ RUN echo 'admin:docker' | chpasswd
 RUN echo 'root:docker' | chpasswd
 RUN echo 'admin ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/admin
 RUN chmod 0440 /etc/sudoers.d/admin
+RUN useradd -d /home/git -m -s /bin/bash git
+RUN sed -i 's/git:!/git:NP/' /etc/shadow
 
 # Get Supervisor
 RUN apt-get install -y supervisor
@@ -37,6 +39,7 @@ RUN apt-get install -y postfix
 
 # Supervisor
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+ADD sudoers /etc/sudoers
 
 # Enabled mod rewrite for phabricator
 RUN a2enmod rewrite
@@ -45,9 +48,14 @@ RUN sed -i 's/\[mysqld\]/[mysqld]\nsql_mode=STRICT_ALL_TABLES/' /etc/mysql/my.cn
 ADD ./startup.sh /opt/startup.sh
 RUN chmod +x /opt/startup.sh
 
+# Setup ssh repo hosting for phabricator
+ADD sshd_config.phabricator /etc/ssh/sshd_config
+ADD phabricator-ssh-hook.sh /etc/ssh/phabricator-ssh-hook.sh
+RUN chmod 755 /etc/ssh/phabricator-ssh-hook.sh
+
 ADD phabricator.conf /etc/apache2/sites-available/phabricator.conf
 RUN ln -s /etc/apache2/sites-available/phabricator.conf /etc/apache2/sites-enabled/phabricator.conf
-RUN rm -f /etc/apache2/sites-enabled/000-default
+RUN rm -f /etc/apache2/sites-enabled/000-default.conf
 
 RUN cd /opt/ && git clone https://github.com/facebook/libphutil.git
 RUN cd /opt/ && git clone https://github.com/facebook/arcanist.git
@@ -57,9 +65,12 @@ RUN mkdir -p '/var/repo/'
 
 ADD mysql-phabricator.conf /etc/mysql/conf.d/mysql-phabricator.cnf
 ADD php-phabricator.ini /etc/php5/mods-available/php-phabricator.ini
-RUN ln -s /etc/php5/mods-available/php-phabricator.ini /etc/php5/conf.d/20-php-phabricator.ini
+RUN ln -s /etc/php5/mods-available/php-phabricator.ini /etc/php5/apache2/conf.d/20-php-phabricator.ini
+RUN ln -s /etc/php5/mods-available/php-phabricator.ini /etc/php5/cli/conf.d/20-php-phabricator.ini
 
 RUN ulimit -c 10000
+
+ADD my.cnf /etc/mysql/my.cnf
 
 # Clean packages
 RUN apt-get clean
