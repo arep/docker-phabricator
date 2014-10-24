@@ -22,9 +22,13 @@ Go to http://localhost.local:8081
 
 Docker HTTP listen on 8081 and ssh listen on 2244
 
-You can connect with ssh with this command (and password docker): 
+You can connect with this command: 
 ```
-ssh admin@localhost -p 2244
+docker-enter phabricator
+```
+Nsenter (and docker-enter) can be installed like this:
+```
+docker run --rm -v /usr/local/bin:/target jpetazzo/nsenter
 ```
 
 Mysql files are written on `/data/phabricator/mysql` (described in run-server.sh)
